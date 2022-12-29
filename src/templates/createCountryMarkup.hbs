@@ -1,4 +1,6 @@
+{{#each this}}
 <li class="country__item">
-    <img class="country__flag" src=${country.flags.svg} alt=${country.name.official}/>
-    ${country.name.official}
-</li>`
+    <img class="country__flag" src={{flags.svg}} alt={{name.official}}/>
+    {{name.common}}
+</li>
+{{/each}}

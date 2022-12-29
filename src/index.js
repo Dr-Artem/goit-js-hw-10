@@ -1,15 +1,17 @@
 import './css/styles.css';
-
 import Notiflix from 'notiflix';
+import debounce from 'lodash.debounce';
 import { fetchCountries } from './fetchCountries';
 import createCountryMarkup from "./templates/createCountryMarkup.hbs"
 
-
+const DEBOUNCE_DELAY = 300;
+const countryNameInput = document.getElementById("search-box");
 const listOfCountries = document.querySelector(".country-list");
 const oneCountry = document.querySelector(".country-info");
 
-
-fetchCountries().then(data => {
+function handleInput(event) {
+	let searchValue = event.target.value
+	fetchCountries(searchValue).then(data => {
     if (data.length > 10) {
         Notiflix.Notify.info("Too many matches found. Please enter a more specific name.")
         return
@@ -17,7 +19,7 @@ fetchCountries().then(data => {
     if (data.length >= 2) {
         const handleCountry = data
             .map((country) => {
-            return `<li class="country__item"><img class="country__flag" src=${country.flags.svg} alt=${country.name.official}></img>${country.name.official}</li>`}).join("")
+            return `<li class="country__item"><img class="country__flag" src=${country.flags.svg} alt=${country.name.official}></img>${country.name.common}</li>`}).join("")
         oneCountry.innerHTML = "";
         listOfCountries.innerHTML = handleCountry;
         
@@ -43,17 +45,14 @@ fetchCountries().then(data => {
         console.log(data);
     }
     if (data.length === 1) {
-        
-        // const handleCountry = data
-        //     .map((country) => {
-        //     return })
-
         listOfCountries.innerHTML = "";
-        // oneCountry.innerHTML = createCountryMarkup(data);        
+        oneCountry.innerHTML = createCountryMarkup(data);        
     }
     
-}).catch(err => {
-    Notiflix.Notify.failure("Oops, there is no country with that name")
-})
+	}).catch(err => {
+		Notiflix.Notify.failure("Oops, there is no country with that name")
+	})
+};
 
 
+countryNameInput.addEventListener("input", debounce(handleInput, DEBOUNCE_DELAY))
